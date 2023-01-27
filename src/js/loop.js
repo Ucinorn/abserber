@@ -4,7 +4,7 @@
 // in intermediate states, such as when the player is
 // choosing the next step.
 
-import { store } from '~/store'
+import { constants, player } from '@/store'
 
 export const intervals = {
   intervalIds: {},
@@ -31,21 +31,23 @@ export const intervals = {
 const save_key = 'Abserber'
 
 export const save = () => {
-  const { player, atts, version } = store
+  const { version } = constants
   const save = JSON.stringify({
     player,
-    atts,
     version
   })
+  console.log('Saving...')
   localStorage.setItem(save_key, save )
 }
 
 export const load = () => {
+  intervals.stop()
   const loaded = localStorage.getItem(save_key)
   if (loaded == null) {
     console.log('No Save Game data Loaded');
     isReturnStatement
   }
+  console.log('Loading...')
   for ( key in Object.keys(loaded)) {
     if ( key in store ) {
       Object.assign( store, loaded[key])
