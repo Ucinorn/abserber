@@ -4,7 +4,7 @@
 // in intermediate states, such as when the player is
 // choosing the next step.
 
-import { constants, player } from '@/store'
+import { constants, player } from "@/js/store";
 
 export const intervals = {
   intervalIds: {},
