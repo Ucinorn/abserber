@@ -1,8 +1,9 @@
 <template>
   <v-card
     :loading="loading"
-    outlined
+    variant="outlined"
     :color="isDead ? 'red lighten-5': ''"
+    class="h-100"
   >
     <template slot="progress">
       <v-progress-linear
@@ -35,13 +36,11 @@
 
       >
       </v-progress-linear>
-      <div class="my-4 text-subtitle-1">
-        <template v-for="(value, key) in player.atts" :key="key">
-          <v-row>
-            <v-col>{{ attName(key) }}: </v-col>
-            <v-col>{{ value }} </v-col>
-          </v-row>
-        </template>
+      <div class="my-4">
+        <div v-for="(value, key) in player.atts" :key="key" class="d-flex mb-1">
+            <div class="mr-2">{{ attName(key) }}:</div>
+            <div class="text-bold ml-auto">{{ value }} </div>
+        </div>
       </div>
 
       <div></div>
