@@ -22,7 +22,9 @@
 </template>
 
 <script setup lang="ts">
-  import Main from '@/components/Main.vue'
+
+  import Main from './Main.vue'
   import TopBar from '@/components/TopBar.vue'
   import BottomBar from '@/components/BottomBar.vue'
+
 </script>

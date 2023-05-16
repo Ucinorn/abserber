@@ -3,7 +3,7 @@
     :loading="loading"
     variant="outlined"
     :color="isDead ? 'red lighten-5': ''"
-    class="min-h-200"
+    class="min-h-200 h-100 d-flex flex-column "
   >
     <template slot="progress">
       <v-progress-linear
@@ -18,47 +18,54 @@
     ></v-img> -->
 
 
-    <div class="h6 text-center uppercase px-1 mt-2" style="min-height: 2rem; line-height: 1">{{enemy.name}}</div>
-    <div class="text-center">
-      <v-icon class="pa-1">{{ enemy.icon || 'mdi-skull' }}</v-icon>
+    <div class="h6 text-center uppercase px-1 mt-2 h-4" style="line-height: 1.1">{{obj.name}}</div>
+    <div class="text-center h-4">
+      <v-icon class="ma-1 pa-1" :icon="obj.icon || 'mdi-skull'"></v-icon>
     </div>
-    <v-card-text>
+
       <v-progress-linear
         v-if="active"
         color="blue"
         height="10"
         striped
-        v-model="enemy.atb"
+        v-model="obj.atb"
       >
       </v-progress-linear>
       <v-progress-linear
+        v-if="active"
         color="red"
         height="20"
         striped
         v-model="hpPercentage"
+        class="mb-1"
       >
-        <strong v-if="'hp' in enemy">HP: {{ enemy.hp }}</strong>
-        <strong v-if="'max_hp' in enemy">/ {{ enemy.max_hp }}</strong>
+        <strong v-if="'hp' in obj">HP: {{ obj.hp }}</strong>
+        <strong v-if="'max_hp' in obj">/ {{ obj.max_hp }}</strong>
       </v-progress-linear>
 
-      <div v-if="detailed">
-        <div v-for="(value, key) in enemy.atts" :key="key" class="d-flex mb-1">
-            <div class="mr-2">{{ key }}:</div>
-            <div class="text-bold ml-auto">{{ value }} </div>
+      <v-card-text class="pa-1" v-if="detailed">
+        <div v-for="(value, key) of obj.atts" :key="key">
+           <Attribute :attName="key" :value="value"></Attribute>
         </div>
-      </div>
-    </v-card-text>
 
-    <v-divider class="mx-4"></v-divider>
+        <v-divider class="mx-2"></v-divider>
+
+        <div v-for="(value, key) of obj.gives" :key="key">
+           <Attribute :attName="key" :value="value" :changed="true"></Attribute>
+        </div>
+    </v-card-text>
   </v-card>
 </template>
 
 <script setup lang="ts">
+
   import { ref, reactive, watch, computed } from 'vue'
-  import { constants } from '@/js/store.js' // @ts-ignore
+  import { constants, battle } from '@/js/store.js' // @ts-ignore
+
+  import Attribute from '@/components/Attribute.vue'
 
   const props = defineProps({
-    enemy: {
+    obj: {
       type: Object,
       required: true,
     },
@@ -67,12 +74,12 @@
       required: false,
       default: false,
     },
-    detailed: {
+    expanded: {
       type: Boolean,
       required: false,
-      default: false,
+      default: true,
     },
-    selected: {
+    detailed: {
       type: Boolean,
       required: false,
       default: false,
@@ -81,14 +88,28 @@
 
   // attName performs a translation of an attribute to names constants
   const attName = ( key:string ) => ( ( key in constants.attNames ) ? constants.attNames[key] : key )
+  const iconify = ( key:string ) => ( ( key in constants.attributes && constants.attributes[key].icon ) || false )
 
-  const isDead = computed( ( ) => !(props.enemy.hp > 0) )
+  const isDead = computed( ( ) => !(props.obj.atts.hp > 0) && props.active )
 
   const hpPercentage = computed( ( ) => {
-    if ( ! props.enemy.hp ) return 0
-    return Math.ceil(( props.enemy.hp / props.enemy.max_hp ) * 100 )
+    if ( ! props.obj.atts.hp ) return 0
+    return Math.ceil(( props.obj.atts.hp / props.obj.atts.max_hp ) * 100 )
   })
 
   const loading = ref(false) // may be used later?
+
+  const canAddEnemy = computed( ( ) => battle.length >= constants.maxEnemies )
+
+  const addToBattle = () => {
+    if ( ! canAddEnemy ) return
+    // clone a new enemy object to prevent pass by reference=
+    let enemy = props.obj
+    enemy = { ...enemy }
+    // set the ebemy max_hp based on default hp
+    enemy.max_hp = enemy.max_hp || enemy.hp
+    console.log('Adding Enemy', enemy)
+    battle.push( enemy )
+  }
 
 </script>

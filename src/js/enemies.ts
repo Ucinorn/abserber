@@ -1,13 +1,34 @@
-import constants from "./constants.js";
-const { attributes } = constants;
+import { constants } from "./store";
+const { attributes, statuses } = constants
 
-const basic = {
+const attkeys = Object.keys(attributes)
+
+type AttObject = {
+  [key in typeof attkeys[number]]: number;
+};
+
+type Enemy = {
+  name: string;
+  description: string;
+  icon?: string;
+  atts: AttObject;
+  gives: AttObject;
+  blooded?: AttObject;
+  abilities?: string[];
+};
+
+type EnemyCollection = {
+  [key: string]: Enemy
+}
+
+const basic:EnemyCollection = {
   slime: {
     name: "Blue Slime",
     description:
       "A basic slime found in all starting areas. Easy but boring to kill.",
-    hp: 6,
+    icon: 'mdi-emoticon-poop',
     atts: {
+      hp: 6,
       atk: 0.5,
     },
     gives: {
@@ -17,8 +38,9 @@ const basic = {
   rat: {
     name: "Harmless Rat",
     description: "Rats just minding their own business.",
-    hp: 2,
+    icon: 'mdi-rodent',
     atts: {
+      hp: 2,
       atk: 3,
       speed: 2000,
     },
@@ -31,8 +53,9 @@ const basic = {
   bat: {
     name: "Tiny Bat",
     description: "Pretty spooky but folds like wet paper.",
-    hp: 5,
+    icon: 'mdi-bat',
     atts: {
+      hp: 5,
       atk: 1,
       speed: 4000,
       lifesteal: 0.5, // 50% lifesteal
@@ -47,30 +70,33 @@ const basic = {
     name: "Mangy Wolf",
     description:
       "This wolf has seen better days, but can still put up a fight.",
-    hp: 7,
+    icon: 'mdi-dog-side',
     atts: {
+      hp: 7,
       atk: 2,
       speed: 400,
-      critChance: 0.1,
+      crit: 0.1,
     },
     blooded: {
-      critChance: 0.5,
+      crit: 0.5,
       speed: 2000,
     },
     gives: {
       atk: 0.25,
-      critChance: 0.001,
+      crit: 0.001,
     },
   },
 };
+
 
 const intermediate = {
   tree: {
     name: "Ent",
     description:
       "A (mostly) harmless walking tree. Can be hard to kill, but persistence will pay off",
-    hp: 30,
+    icon: 'mdi-tree',
     atts: {
+      hp: 30,
       atk: 10,
       dr: 1,
       regen: 0.005, // recovers 5 % of hp each turn
@@ -85,8 +111,8 @@ const intermediate = {
     name: "Oversized Mosquito",
     description:
       "Nothing worse than a buzzing bloodsucker. Leave it long enough and it will wear you down.",
-    hp: 5,
     atts: {
+      hp: 5,
       atk: 1,
       dodge: 0.5,
       speed: 6000,
@@ -97,11 +123,13 @@ const intermediate = {
       dodge: 0.01,
     },
   },
-};
+} as { [key: string]: Enemy };
 
 const enemies = {
   basic,
   intermediate,
+} as {
+  [key: string]: { [key: string]: Enemy };
 };
 
 // do a sanity
